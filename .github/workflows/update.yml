@@ -1,0 +1,33 @@
+name: Aktualizácia tenisiek
+
+on:
+  schedule:
+    - cron: '0 */10 * * *' # Každých 10 hodín
+  workflow_dispatch: # Manuálne spustenie cez GitHub
+
+jobs:
+  update-sneakers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repozitár
+        uses: actions/checkout@v3
+
+      - name: Nastavenie Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Inštalácia závislostí
+        run: npm install axios cheerio
+
+      - name: Spustenie update skriptu
+        run: node scripts/updateSneakers.js
+
+      - name: Commit & push zmien
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add data/sneakers.json
+          git commit -m "🟢 Automatický update tenisiek"
+          git push
